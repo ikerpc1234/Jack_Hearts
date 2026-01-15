@@ -1,4 +1,4 @@
-import { useGameState } from '@/hooks/useGameState';
+import { useRealtimeGame } from '@/hooks/useRealtimeGame';
 import { HomeScreen } from '@/components/screens/HomeScreen';
 import { LobbyScreen } from '@/components/screens/LobbyScreen';
 import { GameScreen } from '@/components/screens/GameScreen';
@@ -8,6 +8,8 @@ const Index = () => {
   const {
     gameState,
     currentPlayer,
+    isLoading,
+    error,
     createGame,
     joinGame,
     removePlayer,
@@ -18,15 +20,18 @@ const Index = () => {
     continueToNextRound,
     endGame,
     resetGame,
-  } = useGameState();
+    clearError,
+  } = useRealtimeGame();
 
   // No game state - show home screen
   if (!gameState || !currentPlayer) {
     return (
       <HomeScreen
-        onCreateGame={(name) => createGame(name)}
-        onJoinGame={(name) => joinGame(name)}
-        hasExistingGame={!!gameState}
+        onCreateGame={createGame}
+        onJoinGame={joinGame}
+        isLoading={isLoading}
+        error={error}
+        onClearError={clearError}
       />
     );
   }

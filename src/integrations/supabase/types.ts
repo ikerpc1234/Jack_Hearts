@@ -14,7 +14,146 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      games: {
+        Row: {
+          created_at: string
+          current_round: number
+          host_id: string
+          id: string
+          phase: string
+          round_start_time: string | null
+          updated_at: string
+          voting_end_time: string | null
+          winner: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_round?: number
+          host_id: string
+          id: string
+          phase?: string
+          round_start_time?: string | null
+          updated_at?: string
+          voting_end_time?: string | null
+          winner?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_round?: number
+          host_id?: string
+          id?: string
+          phase?: string
+          round_start_time?: string | null
+          updated_at?: string
+          voting_end_time?: string | null
+          winner?: string | null
+        }
+        Relationships: []
+      }
+      players: {
+        Row: {
+          eliminated_round: number | null
+          game_id: string
+          id: string
+          is_host: boolean
+          is_jack: boolean
+          joined_at: string
+          last_vote: string | null
+          name: string
+          status: string
+          suit: string | null
+          updated_at: string
+          vote_correct: boolean | null
+        }
+        Insert: {
+          eliminated_round?: number | null
+          game_id: string
+          id: string
+          is_host?: boolean
+          is_jack?: boolean
+          joined_at?: string
+          last_vote?: string | null
+          name: string
+          status?: string
+          suit?: string | null
+          updated_at?: string
+          vote_correct?: boolean | null
+        }
+        Update: {
+          eliminated_round?: number | null
+          game_id?: string
+          id?: string
+          is_host?: boolean
+          is_jack?: boolean
+          joined_at?: string
+          last_vote?: string | null
+          name?: string
+          status?: string
+          suit?: string | null
+          updated_at?: string
+          vote_correct?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "players_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      round_results: {
+        Row: {
+          correct: boolean
+          created_at: string
+          eliminated: boolean
+          game_id: string
+          id: string
+          player_id: string
+          player_name: string
+          round_number: number
+          vote: string | null
+        }
+        Insert: {
+          correct: boolean
+          created_at?: string
+          eliminated?: boolean
+          game_id: string
+          id?: string
+          player_id: string
+          player_name: string
+          round_number: number
+          vote?: string | null
+        }
+        Update: {
+          correct?: boolean
+          created_at?: string
+          eliminated?: boolean
+          game_id?: string
+          id?: string
+          player_id?: string
+          player_name?: string
+          round_number?: number
+          vote?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "round_results_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "round_results_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
