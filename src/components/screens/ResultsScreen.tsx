@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { GameState, Player, SUIT_NAMES } from '@/types/game';
 import { PlayerCard } from '@/components/game/PlayerCard';
 import { SuitIcon } from '@/components/game/SuitIcon';
+import { useHaptics } from '@/hooks/useHaptics';
 import { cn } from '@/lib/utils';
 import { ArrowRight, Trophy, Skull, RefreshCw } from 'lucide-react';
 
@@ -22,6 +24,23 @@ export function ResultsScreen({
   const lastRoundResult = gameState.roundResults[gameState.roundResults.length - 1];
   const activePlayers = gameState.players.filter(p => p.status === 'active');
   const jackPlayer = gameState.players.find(p => p.isJack);
+  const haptics = useHaptics();
+
+  // Check if current player was eliminated this round
+  const wasEliminated = lastRoundResult?.eliminations.some(
+    e => e.playerId === currentPlayer.id
+  );
+
+  // Trigger haptic feedback based on outcome
+  useEffect(() => {
+    if (wasEliminated) {
+      haptics.eliminated();
+    } else if (isGameEnded) {
+      haptics.success();
+    } else {
+      haptics.roundEnd();
+    }
+  }, [wasEliminated, isGameEnded]);
 
   return (
     <div className="min-h-screen flex flex-col p-4">

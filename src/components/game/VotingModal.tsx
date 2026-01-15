@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { Suit, SUIT_NAMES, SUIT_SYMBOLS } from '@/types/game';
+import { useState, useEffect } from 'react';
+import { Suit, SUIT_NAMES } from '@/types/game';
 import { SuitIcon } from './SuitIcon';
 import { TimerDisplay } from './TimerDisplay';
 import { useRobustTimer } from '@/hooks/useRobustTimer';
+import { useHaptics } from '@/hooks/useHaptics';
 import { cn } from '@/lib/utils';
 import { AlertTriangle } from 'lucide-react';
 
@@ -24,14 +25,20 @@ export function VotingModal({
   onTimeExpired,
 }: VotingModalProps) {
   const [selectedSuit, setSelectedSuit] = useState<Suit | null>(currentVote || null);
+  const haptics = useHaptics();
 
-  const { formattedTime, progress, isComplete, timeRemaining } = useRobustTimer({
+  const { formattedTime, progress, timeRemaining } = useRobustTimer({
     targetTime: votingEndTime,
     onComplete: onTimeExpired,
     enabled: !hasVoted,
   });
 
   const isUrgent = timeRemaining < 10000; // Less than 10 seconds
+
+  // Trigger haptic feedback when voting modal appears
+  useEffect(() => {
+    haptics.votingStart();
+  }, []);
 
   const handleVote = () => {
     if (selectedSuit && !hasVoted) {
