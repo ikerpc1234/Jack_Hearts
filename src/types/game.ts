@@ -2,7 +2,7 @@ export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
 
 export type PlayerStatus = 'active' | 'eliminated' | 'spectator';
 
-export type GamePhase = 'lobby' | 'playing' | 'voting' | 'results' | 'ended';
+export type GamePhase = 'lobby' | 'playing' | 'voting' | 'results' | 'ended' | 'finished';
 
 export interface Player {
   id: string;
