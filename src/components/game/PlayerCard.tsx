@@ -1,7 +1,7 @@
-import { Player, Suit, SUIT_NAMES } from '@/types/game';
+import { Player, SUIT_NAMES } from '@/types/game';
 import { SuitIcon } from './SuitIcon';
 import { cn } from '@/lib/utils';
-import { Crown, Skull, Eye, X } from 'lucide-react';
+import { Crown, Skull, Eye, X, CheckCircle2 } from 'lucide-react';
 
 interface PlayerCardProps {
   player: Player;
@@ -10,6 +10,7 @@ interface PlayerCardProps {
   isCurrentPlayer?: boolean;
   canRemove?: boolean;
   onRemove?: () => void;
+  showVotingStatus?: boolean;
 }
 
 export function PlayerCard({ 
@@ -19,8 +20,10 @@ export function PlayerCard({
   isCurrentPlayer = false,
   canRemove = false,
   onRemove,
+  showVotingStatus = false,
 }: PlayerCardProps) {
   const isEliminated = player.status === 'eliminated';
+  const hasVoted = !!player.lastVote;
 
   return (
     <div
@@ -66,14 +69,32 @@ export function PlayerCard({
         )}
       </div>
 
+      {/* Voting status indicator */}
+      {showVotingStatus && !isEliminated && (
+        <div className="flex-shrink-0">
+          {hasVoted ? (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/20 text-green-500">
+              <CheckCircle2 className="w-4 h-4" />
+              <span className="text-xs font-medium">Votó</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-muted text-muted-foreground">
+              <span className="text-xs">Votando...</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Status icons */}
-      <div className="flex-shrink-0">
-        {isEliminated ? (
-          <Skull className="w-5 h-5 text-destructive" />
-        ) : player.status === 'spectator' ? (
-          <Eye className="w-5 h-5 text-muted-foreground" />
-        ) : null}
-      </div>
+      {!showVotingStatus && (
+        <div className="flex-shrink-0">
+          {isEliminated ? (
+            <Skull className="w-5 h-5 text-destructive" />
+          ) : player.status === 'spectator' ? (
+            <Eye className="w-5 h-5 text-muted-foreground" />
+          ) : null}
+        </div>
+      )}
 
       {/* Remove button */}
       {canRemove && onRemove && (
