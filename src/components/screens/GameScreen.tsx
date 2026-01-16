@@ -120,6 +120,7 @@ export function GameScreen({
                 player={player}
                 isCurrentPlayer={player.id === currentPlayer.id}
                 showSuit={getVisibleSuit(player)}
+                showVotingStatus={isVoting}
               />
             ))}
           </div>
