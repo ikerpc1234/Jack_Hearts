@@ -403,24 +403,32 @@ export function useRealtimeGame() {
     if (!gameState) return;
 
     try {
-      const activePlayers = gameState.players.filter(p => p.status === 'active');
+      // IMPORTANT: Fetch fresh player data from DB to get the latest votes
+      const { data: freshPlayers, error: fetchError } = await supabase
+        .from('players')
+        .select('*')
+        .eq('game_id', gameState.id);
+
+      if (fetchError) throw fetchError;
+
+      const activePlayers = (freshPlayers || []).filter((p: DbPlayer) => p.status === 'active');
       const roundResultsToInsert: Omit<DbRoundResult, 'id'>[] = [];
       const eliminatedPlayerIds: string[] = [];
 
       for (const player of activePlayers) {
-        const correct = player.lastVote === player.suit;
+        const correct = player.last_vote === player.suit;
         
         roundResultsToInsert.push({
           game_id: gameState.id,
           round_number: gameState.currentRound,
           player_id: player.id,
           player_name: player.name,
-          vote: player.lastVote || null,
+          vote: player.last_vote || null,
           correct,
           eliminated: !correct,
         });
 
-        if (!correct || !player.lastVote) {
+        if (!correct || !player.last_vote) {
           eliminatedPlayerIds.push(player.id);
         }
       }
@@ -448,7 +456,7 @@ export function useRealtimeGame() {
         .from('players')
         .update({ last_vote: null })
         .eq('game_id', gameState.id)
-        .eq('status', 'active');
+        .not('id', 'in', `(${eliminatedPlayerIds.join(',')})`);
 
       // Fetch updated players to check win conditions
       const { data: updatedPlayers } = await supabase
@@ -473,7 +481,7 @@ export function useRealtimeGame() {
         newPhase = 'finished';
       }
 
-      // Update game
+      // Update game phase
       await supabase
         .from('games')
         .update({
